@@ -1,0 +1,7 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_employee_education,access_employee_education,model_employee_education,"",1,1,1,1
+access_employee_education_degree,access_access_employee_education_degree,model_employee_education_degree,"",1,1,1,1
+access_employee_employment_history,access_employee_employment_history,model_employee_employment_history,"",1,1,1,1
+access_employee_professional_training_history,access_employee_professional_training_history,model_employee_professional_training_history,"",1,1,1,1
+access_employee_reference,access_employee_reference,model_employee_reference,"",1,1,1,1
+access_employee_asset_line,access_employee_asset_line,model_employee_asset_line,"",1,1,1,1

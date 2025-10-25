@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="inherit_employee_form_view" model="ir.ui.view">
+        <field name="name">hr.employee.inherit.form.view</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='private_car_plate']" position="before">
+                <field name="driving_license_no"/>
+                <field name="license_place_of_issuance"/>
+                <field name="license_validity_date"/>
+            </xpath>
+            <xpath expr="//div[hasclass('o_employee_avatar')]" position="after">
+                <group>
+                    <group>
+                        <field name="next_of_kin_name"/>
+                        <field name="father_name"/>
+                        <field name="husband_name"/>
+                    </group>
+                </group>
+            </xpath>
+            <xpath expr="//field[@name='gender']" position="after">
+                <field name="blood_group"/>
+            </xpath>
+            <xpath expr="//page[@name='personal_information']" position="after">
+
+                <page name="reference" string="References">
+                    <span>Please Provide Two Reference other than Relatives and Previous Employer's</span>
+                     <field name="reference_ids">
+                        <list editable="bottom">
+                            <field name="name"/>
+                            <field name="organization"/>
+                            <field name="designation"/>
+                            <field name="mobile_no"/>
+                            <field name="email"/>
+                        </list>
+                    </field>
+                </page>
+                <page string="Asset Handover Form">
+                    <field name="asset_line_ids" widget="section_and_note_one2many">
+                        <list editable="bottom" string="Employee Assets">
+                            <!-- Show normal asset lines -->
+                            <field name="sequence" widget="handle"/>
+                            <field name="asset_name" required="1" width="195px"/>
+                            <field name="qty" width="35px"/>
+                            <field name="company_made_by" width="165px"/>
+                            <field name="model_gen"/>
+                            <field name="imei_1"/>
+                            <field name="imei_2"/>
+                            <field name="sim_number"/>
+                            <field name="capacity"/>
+                            <field name="remarks"/>
+                        </list>
+                    </field>
+
+                </page>
+                <page name="security" string="Security">
+                    <group>
+                        <field name="bank_name"/>
+                        <field name="cheque_no"/>
+                        <field name="cheque_submission_date"/>
+                        <field name="cheque_attachment" widget="image"/>
+                    </group>
+                </page>
+            </xpath>
+            <xpath expr="//page[@name='public']" position="before">
+                <page string="Employee Details" name="employee_details">
+                    <h3>Education (Start From Most Recent Qualification</h3>
+                    <field name="education_ids">
+                        <list editable="bottom">
+                            <field name="degree_id"/>
+                            <field name="institute"/>
+                            <field name="city"/>
+                            <field name="specialization"/>
+                            <field name="year"/>
+                            <field name="cgpa"/>
+                            <field name="honours"/>
+                        </list>
+                    </field>
+
+                    <h3>Employment History</h3>
+                    <field name="employment_history_ids">
+                        <list editable="bottom">
+                            <field name="position"/>
+                            <field name="organization"/>
+                            <field name="city_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="employment_type"/>
+                            <field name="last_salary"/>
+                            <field name="reason_of_leaving"/>
+                        </list>
+                    </field>
+
+
+                    <h3>Professional Training</h3>
+
+                    <field name="professional_training_ids">
+                        <list editable="bottom">
+                            <field name="training_title"/>
+                            <field name="institute"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="city"/>
+                        </list>
+                    </field>
+
+                    <h3>Medical History</h3>
+
+                    <group>
+                        <group string="Any Disability">
+                            <group>
+                                <field name="disability_1"/>
+                                <field name="disability_2"/>
+                            </group>
+                            <group>
+                                <field name="disability_1_date"/>
+                                <field name="disability_2_date"/>
+                            </group>
+                        </group>
+                        <group string="Illness &amp; Surgeries">
+                            <field name="illness_or_chronic_disease"/>
+                            <field name="diagnosed_since"/>
+
+                            <field name="surgeries"/>
+                            <field name="surgeries_date"/>
+                        </group>
+                        <group string="Parents Medical Status">
+                            <group>
+                                <separator string="Father" colspan="2"/>
+                                <field name="father_diabetes" widget="radio"/>
+                                <field name="mother_diabetes" widget="radio"/>
+                            </group>
+                            <group>
+                                <separator string="Mother" colspan="2"/>
+                                <field name="father_hypertension" widget="radio"/>
+                                <field name="mother_hypertension" widget="radio"/>
+                            </group>
+                            <label for="any_other_medical_info"/>
+                            <field name="any_other_medical_info"/>
+                        </group>
+                    </group>
+                    <h3>Other Information</h3>
+                        <field name="other_information"/>
+                </page>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -8,7 +8,7 @@
         <field name="model">hr.employee</field>
         <field name="inherit_id" ref="hr.view_employee_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='hr_settings']" position="after">
+            <xpath expr="//page[@name='hr_settings']" position="before">
                 <page string="Biometric Devices">
                     <field name="biometric_device_ids">
                         <list editable="bottom">
