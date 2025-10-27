@@ -5,3 +5,4 @@ access_employee_employment_history,access_employee_employment_history,model_empl
 access_employee_professional_training_history,access_employee_professional_training_history,model_employee_professional_training_history,"",1,1,1,1
 access_employee_reference,access_employee_reference,model_employee_reference,"",1,1,1,1
 access_employee_asset_line,access_employee_asset_line,model_employee_asset_line,"",1,1,1,1
+access_res_company,access_res_company,base.model_res_company,"exl_employee_customization.group_companies_access",1,1,1,1

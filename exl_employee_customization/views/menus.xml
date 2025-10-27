@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<odoo>
+        <menuitem id="menu_action_customized_res_company_form"
+                  action="base.action_res_company_form"
+                  groups="exl_employee_customization.group_companies_access"
+                  web_icon="exl_employee_customization,static/description/company_icon.png"
+        />
+</odoo>

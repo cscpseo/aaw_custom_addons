@@ -14,11 +14,13 @@
     'license': 'Other proprietary',
     'description': """
         Customization of Employee Form""",
-    'depends': ['hr'],
+    'depends': ['base','hr'],
     'data': [
+        "security/hr_security.xml",
         "security/ir.model.access.csv",
         "views/inherit_hr_employee.xml",
         "views/employee_education_degree_views.xml",
+        "views/menus.xml",
     ],
     'demo': [
     ],
