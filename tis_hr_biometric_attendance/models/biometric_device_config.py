@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-# This module and its content is copyright of Technaureus Info Solutions Pvt. Ltd.
-# - © Technaureus Info Solutions Pvt. Ltd 2020. All rights reserved.
-
 from odoo import api, fields, models, _
 from collections import defaultdict
 from odoo.addons.base.models.res_partner import _tz_get
@@ -24,6 +21,18 @@ class BiometricDeviceConfig(models.Model):
     device_password = fields.Char(string='Device Password')
     time_zone = fields.Selection(_tz_get, string='Timezone', default=lambda self: self.env.user.tz or 'GMT')
     company_id = fields.Many2one('res.company', default=lambda self: self.env.company, readonly=True)
+
+    @api.constrains('device_ip')
+    def _check_device_ip(self):
+        """Ensure Device IP is unique across configurations."""
+        for config in self:
+            if config.device_ip:
+                existing = self.env['biometric.config'].search([
+                    ('device_ip', '=', config.device_ip),
+                    ('id', '!=', config.id)
+                ], limit=1)
+                if existing:
+                    raise ValidationError('Device IP already configured for another record.')
 
     @api.onchange('is_password_set')
     def on_is_password_set_change(self):
