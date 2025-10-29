@@ -24,15 +24,11 @@ class BiometricDeviceConfig(models.Model):
 
     @api.constrains('device_ip')
     def _check_device_ip(self):
-        """Ensure Device IP is unique across configurations."""
+        """Validation if Same Device IP Already Exists"""
         for config in self:
-            if config.device_ip:
-                existing = self.env['biometric.config'].search([
-                    ('device_ip', '=', config.device_ip),
-                    ('id', '!=', config.id)
-                ], limit=1)
-                if existing:
-                    raise ValidationError('Device IP already configured for another record.')
+            existing_configuration = self.env['biometric.config'].search([('device_ip','=',config.device_ip)])
+            if existing_configuration:
+                raise ValidationError('Device IP already configured')
 
     @api.onchange('is_password_set')
     def on_is_password_set_change(self):

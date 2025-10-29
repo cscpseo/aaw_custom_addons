@@ -7,7 +7,7 @@ class EmployeeEmploymentHistory(models.Model):
     employee_id = fields.Many2one('hr.employee', string='Employee', ondelete='cascade')
     position = fields.Char(string='Position')
     organization = fields.Char(string='Organization')
-    city_id = fields.Many2one('res.city', string='City')  # Using city Many2one as before
+    city_id = fields.Char(string='City')  # Using city Many2one as before
     date_from = fields.Date(string='From')
     date_to = fields.Date(string='To')
     employment_type = fields.Selection([
