@@ -134,84 +134,91 @@ class BiometricDeviceConfig(models.Model):
         port = self.port
         password = self.device_password
         zk = ZK(ip, port, password=password)
+
         try:
             conn = zk.connect()
-            if conn:
-                attendances = zk.get_attendance()
-                device = self.name
-                company_id = self.company_id
-                if attendances:
-                    attendence_list = []
-                    for attendance in attendances:
-                        atten_time = datetime.strptime(
-                            attendance.timestamp.strftime('%Y-%m-%d %H:%M:%S'),
-                            '%Y-%m-%d %H:%M:%S')
-                        local_tz = pytz.timezone(self.time_zone or 'GMT')
-                        local_dt = local_tz.localize(atten_time, is_dst=None)
-                        utc_dt = local_dt.astimezone(pytz.utc)
-                        atten_time = fields.Datetime.to_string(utc_dt)
-
-                        employees = self.env['biometric.attendance.devices'].search([
-                            ('biometric_attendance_id', '=', attendance.user_id),
-                            ('device_id', '=', self.id)
-                        ])
-                        if len(employees) > 1:
-                            employee_id = employees.mapped('employee_id')
-                            employee_name = employee_id.mapped('name')
-                            raise UserError(_("Two Users have same Biometric User ID %s ") % employee_name)
-                        if employees:
-                            attendence_dict = {
-                                'user_id': attendance.user_id,
-                                'atten_time': atten_time,
-                                'employee_id': employees.employee_id.id
-                            }
-                            attendence_list.append(attendence_dict)
-
-                    employee_status = defaultdict(list)
-                    sorted_attendance = sorted(attendence_list, key=lambda x: (x['user_id'], x['atten_time']))
-                    for entry in sorted_attendance:
-                        user_id = entry['user_id']
-                        employee_id = entry['employee_id']
-                        entry_time = entry['atten_time']
-                        atten_time = datetime.strptime(entry_time, '%Y-%m-%d %H:%M:%S')
-
-                        if not employee_status[user_id]:
-                            employee_status[user_id].append({'status': 'Check-in', 'time': atten_time})
-                            entry['status'] = 'Check-in'
-                        else:
-                            if atten_time > employee_status[user_id][-1]['time']:
-                                current_status = 'Check-out' if employee_status[user_id][-1]['status'] == 'Check-in' else 'Check-in'
-                                employee_status[user_id].append({'status': current_status, 'time': atten_time})
-                                entry['status'] = current_status
-
-                        existing_log = attend_obj.search([
-                            ('employee_id', '=', employee_id),
-                            ('punching_time', '=', entry_time)
-                        ])
-                        attendance_status = '0' if entry['status'] == 'Check-in' else '1'
-                        vals = {
-                            'employee_id': employee_id,
-                            'punching_time': atten_time,
-                            'status': attendance_status,
-                            'device': str(device),
-                            'company_id': company_id.id,
-                            'is_calculated': existing_log.is_calculated if existing_log else False
-                        }
-                        if existing_log:
-                            existing_log.write(vals)
-                        else:
-                            attend_obj.create(vals)
-
-                    return {
-                        'name': 'Success Message',
-                        'type': 'ir.actions.act_window',
-                        'res_model': 'success.wizard',
-                        'view_mode': 'form',
-                        'view_type': 'form',
-                        'target': 'new'
-                    }
-            else:
+            if not conn:
                 raise ValidationError("Connection failed")
+
+            attendances = zk.get_attendance()
+            if not attendances:
+                raise UserError(_("No logs found on device."))
+
+            device_name = self.name
+            company_id = self.company_id
+
+            attendence_list = []
+
+            # Step 1: Prepare raw attendance list
+            for attendance in attendances:
+                atten_time = attendance.timestamp
+                local_tz = pytz.timezone(self.time_zone or 'GMT')
+                local_dt = local_tz.localize(atten_time, is_dst=None)
+                utc_dt = local_dt.astimezone(pytz.utc)
+                naive_utc_dt = utc_dt.replace(tzinfo=None)
+
+                employees = self.env['biometric.attendance.devices'].search([
+                    ('biometric_attendance_id', '=', attendance.user_id),
+                    ('device_id', '=', self.id)
+                ])
+
+                if len(employees) > 1:
+                    employee_names = employees.mapped('employee_id.name')
+                    raise UserError(
+                        _("Multiple employees linked with same Biometric ID: %s") % ', '.join(employee_names))
+
+                if not employees:
+                    continue  # skip if not found
+
+                attendence_list.append({
+                    'user_id': attendance.user_id,
+                    'employee_id': employees.employee_id.id,
+                    'atten_time': naive_utc_dt,
+                })
+
+            # Step 2: Sort and group by user + date
+            sorted_attendance = sorted(attendence_list, key=lambda x: (x['user_id'], x['atten_time']))
+            employee_daywise = defaultdict(list)
+
+            for entry in sorted_attendance:
+                date_key = (entry['user_id'], entry['atten_time'].date())
+                employee_daywise[date_key].append(entry)
+
+            # Step 3: Assign Check-in / Check-out per day
+            for (user_id, punch_date), entries in employee_daywise.items():
+                entries = sorted(entries, key=lambda x: x['atten_time'])
+                for i, entry in enumerate(entries):
+                    status = '0' if i % 2 == 0 else '1'  # even = check-in, odd = check-out
+                    employee_id = entry['employee_id']
+                    punching_time = entry['atten_time']
+
+                    existing_log = attend_obj.search([
+                        ('employee_id', '=', employee_id),
+                        ('punching_time', '=', punching_time)
+                    ], limit=1)
+
+                    vals = {
+                        'employee_id': employee_id,
+                        'punching_time': punching_time,
+                        'status': status,  # 0 = in, 1 = out
+                        'device': str(device_name),
+                        'company_id': company_id.id,
+                        'is_calculated': existing_log.is_calculated if existing_log else False
+                    }
+
+                    if existing_log:
+                        existing_log.write(vals)
+                    else:
+                        attend_obj.create(vals)
+
+            return {
+                'name': 'Success Message',
+                'type': 'ir.actions.act_window',
+                'res_model': 'success.wizard',
+                'view_mode': 'form',
+                'target': 'new'
+            }
+
         except Exception as e:
             raise UserError(str(e))
 

@@ -20,7 +20,9 @@ class AttendanceLog(models.Model):
     punching_time = fields.Datetime('Punching Time')
     is_calculated = fields.Boolean('Calculated', default=False)
     device = fields.Char('Device')
-    company_id = fields.Many2one('res.company', string='Company', readonly=True, default=lambda self: self.env.company)
+    # company_id = fields.Many2one('res.company', string='Company', readonly=True, default=lambda self: self.env.company)
+    company_id = fields.Many2one('res.company', string='Company', readonly=True, related="employee_id.company_id")
+
 
     def unlink(self):
         if any(self.filtered(lambda log: log.is_calculated == True)):
