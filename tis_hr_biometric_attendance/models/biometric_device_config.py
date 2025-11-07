@@ -3,7 +3,7 @@ from odoo import api, fields, models, _
 from collections import defaultdict
 from odoo.addons.base.models.res_partner import _tz_get
 import pytz
-from datetime import datetime
+from datetime import datetime, time
 from ..zk import ZK
 from odoo.exceptions import UserError, ValidationError
 import re
@@ -128,6 +128,127 @@ class BiometricDeviceConfig(models.Model):
         except Exception as e:
             raise UserError(str(e))
 
+    # def download_attendance_log(self):
+    #     attend_obj = self.env['attendance.log']
+    #     ip = self.device_ip
+    #     port = self.port
+    #     password = self.device_password
+    #     zk = ZK(ip, port, password=password)
+    #
+    #     try:
+    #         conn = zk.connect()
+    #         if not conn:
+    #             raise ValidationError("Connection failed")
+    #
+    #         attendances = zk.get_attendance()
+    #         if not attendances:
+    #             raise UserError(_("No logs found on device."))
+    #
+    #         device = self.name
+    #         company_id = self.company_id
+    #         time_zone = pytz.timezone(self.time_zone or 'Asia/Karachi')
+    #         attendence_list = []
+    #
+    #         # Step 1: Prepare attendance list in LOCAL TIME
+    #         for attendance in attendances:
+    #             raw_time = attendance.timestamp
+    #             # Convert device time to LOCAL TZ (not UTC yet)
+    #             local_dt = time_zone.localize(raw_time, is_dst=None)
+    #             local_naive = local_dt.replace(tzinfo=None)
+    #
+    #             employees = self.env['biometric.attendance.devices'].search([
+    #                 ('biometric_attendance_id', '=', attendance.user_id),
+    #                 ('device_id', '=', self.id)
+    #             ])
+    #             if len(employees) > 1:
+    #                 employee_names = employees.mapped('employee_id.name')
+    #                 raise UserError(
+    #                     _("Multiple employees linked with same Biometric ID: %s") % ', '.join(employee_names)
+    #                 )
+    #             if not employees:
+    #                 continue
+    #
+    #             attendence_list.append({
+    #                 'user_id': attendance.user_id,
+    #                 'employee_id': employees.employee_id.id,
+    #                 'atten_time': local_naive,  # store local time for grouping
+    #             })
+    #
+    #         # Step 2: Group by employee + LOCAL date
+    #         employee_daywise = defaultdict(list)
+    #         for entry in attendence_list:
+    #             date_key = (entry['employee_id'], entry['atten_time'].date())
+    #             employee_daywise[date_key].append(entry)
+    #
+    #         # Step 3: Create Check-in / Check-out and Auto-checkout at same day end
+    #         for (employee_id, punch_date), entries in employee_daywise.items():
+    #             entries = sorted(entries, key=lambda x: x['atten_time'])
+    #
+    #             last_status = None
+    #             for entry in entries:
+    #                 punch_time_local = entry['atten_time']
+    #                 # Convert to UTC for database storage
+    #                 punch_time_utc = time_zone.localize(punch_time_local).astimezone(pytz.utc).replace(tzinfo=None)
+    #
+    #                 # Alternate check-in/check-out
+    #                 if last_status is None or last_status == '1':
+    #                     status = '0'  # Check-in
+    #                 else:
+    #                     status = '1'  # Check-out
+    #                 last_status = status
+    #
+    #                 existing_log = attend_obj.search([
+    #                     ('employee_id', '=', employee_id),
+    #                     ('punching_time', '=', punch_time_utc)
+    #                 ], limit=1)
+    #
+    #                 vals = {
+    #                     'employee_id': employee_id,
+    #                     'punching_time': punch_time_utc,
+    #                     'status': status,
+    #                     'device': str(device),
+    #                     'company_id': company_id.id,
+    #                     'is_calculated': existing_log.is_calculated if existing_log else False
+    #                 }
+    #
+    #                 if existing_log:
+    #                     existing_log.write(vals)
+    #                 else:
+    #                     attend_obj.create(vals)
+    #
+    #             # Step 4: Add auto-checkout SAME DAY if last punch is Check-in
+    #             if last_status == '0':  # last was Check-in
+    #                 auto_checkout_local = datetime.combine(punch_date, time(23, 59, 59))
+    #                 auto_checkout_utc = time_zone.localize(auto_checkout_local).astimezone(pytz.utc).replace(
+    #                     tzinfo=None)
+    #
+    #                 existing_checkout = attend_obj.search([
+    #                     ('employee_id', '=', employee_id),
+    #                     ('punching_time', '=', auto_checkout_utc),
+    #                     ('status', '=', '1')
+    #                 ], limit=1)
+    #
+    #                 if not existing_checkout:
+    #                     attend_obj.create({
+    #                         'employee_id': employee_id,
+    #                         'punching_time': auto_checkout_utc,
+    #                         'status': '1',  # Check-out
+    #                         'device': str(device),
+    #                         'company_id': company_id.id,
+    #                         'is_calculated': True
+    #                     })
+    #
+    #         return {
+    #             'name': 'Success Message',
+    #             'type': 'ir.actions.act_window',
+    #             'res_model': 'success.wizard',
+    #             'view_mode': 'form',
+    #             'target': 'new'
+    #         }
+    #
+    #     except Exception as e:
+    #         raise UserError(str(e))
+
     def download_attendance_log(self):
         attend_obj = self.env['attendance.log']
         ip = self.device_ip
@@ -144,64 +265,69 @@ class BiometricDeviceConfig(models.Model):
             if not attendances:
                 raise UserError(_("No logs found on device."))
 
-            device_name = self.name
+            device = self.name
             company_id = self.company_id
+            tz = pytz.timezone(self.time_zone or 'Asia/Karachi')
+            attend_list = []
 
-            attendence_list = []
-
-            # Step 1: Prepare raw attendance list
+            # Step 1: Prepare attendance list
             for attendance in attendances:
-                atten_time = attendance.timestamp
-                local_tz = pytz.timezone(self.time_zone or 'GMT')
-                local_dt = local_tz.localize(atten_time, is_dst=None)
-                utc_dt = local_dt.astimezone(pytz.utc)
-                naive_utc_dt = utc_dt.replace(tzinfo=None)
+                raw_time = attendance.timestamp
+                local_dt = tz.localize(raw_time, is_dst=None)
+                local_naive = local_dt.replace(tzinfo=None)
 
                 employees = self.env['biometric.attendance.devices'].search([
                     ('biometric_attendance_id', '=', attendance.user_id),
                     ('device_id', '=', self.id)
                 ])
-
                 if len(employees) > 1:
                     employee_names = employees.mapped('employee_id.name')
                     raise UserError(
-                        _("Multiple employees linked with same Biometric ID: %s") % ', '.join(employee_names))
-
+                        _("Multiple employees linked with same Biometric ID: %s") % ', '.join(employee_names)
+                    )
                 if not employees:
-                    continue  # skip if not found
+                    continue
 
-                attendence_list.append({
-                    'user_id': attendance.user_id,
+                attend_list.append({
                     'employee_id': employees.employee_id.id,
-                    'atten_time': naive_utc_dt,
+                    'atten_time': local_naive,
                 })
 
-            # Step 2: Sort and group by user + date
-            sorted_attendance = sorted(attendence_list, key=lambda x: (x['user_id'], x['atten_time']))
+            # Step 2: Group by employee + date
             employee_daywise = defaultdict(list)
-
-            for entry in sorted_attendance:
-                date_key = (entry['user_id'], entry['atten_time'].date())
+            for entry in attend_list:
+                date_key = (entry['employee_id'], entry['atten_time'].date())
                 employee_daywise[date_key].append(entry)
 
-            # Step 3: Assign Check-in / Check-out per day
-            for (user_id, punch_date), entries in employee_daywise.items():
+            now_local = datetime.now(tz).replace(tzinfo=None)
+
+            # Step 3: Process logs and handle auto-checkout
+            for (employee_id, punch_date), entries in employee_daywise.items():
                 entries = sorted(entries, key=lambda x: x['atten_time'])
-                for i, entry in enumerate(entries):
-                    status = '0' if i % 2 == 0 else '1'  # even = check-in, odd = check-out
-                    employee_id = entry['employee_id']
-                    punching_time = entry['atten_time']
+                checkin_time = None
+
+                for entry in entries:
+                    punch_local = entry['atten_time']
+                    punch_utc = tz.localize(punch_local).astimezone(pytz.utc).replace(tzinfo=None)
+
+                    # Determine if it's check-in or check-out based on previous record
+                    if checkin_time is None:
+                        status = '0'  # Check-in
+                        checkin_time = punch_local
+                    else:
+                        status = '1'  # Check-out
+                        checkin_time = None
 
                     existing_log = attend_obj.search([
                         ('employee_id', '=', employee_id),
-                        ('punching_time', '=', punching_time)
+                        ('punching_time', '=', punch_utc)
                     ], limit=1)
 
                     vals = {
                         'employee_id': employee_id,
-                        'punching_time': punching_time,
-                        'status': status,  # 0 = in, 1 = out
-                        'device': str(device_name),
+                        'punching_time': punch_utc,
+                        'status': status,
+                        'device': str(device),
                         'company_id': company_id.id,
                         'is_calculated': existing_log.is_calculated if existing_log else False
                     }
@@ -210,6 +336,30 @@ class BiometricDeviceConfig(models.Model):
                         existing_log.write(vals)
                     else:
                         attend_obj.create(vals)
+
+                # Step 4: Handle auto-checkout if 10+ hours passed since check-in
+                if checkin_time:
+                    hours_since_checkin = (now_local - checkin_time).total_seconds() / 3600.0
+
+                    if hours_since_checkin >= 11:
+                        auto_checkout_local = datetime.combine(punch_date, time(23, 59, 59))
+                        auto_checkout_utc = tz.localize(auto_checkout_local).astimezone(pytz.utc).replace(tzinfo=None)
+
+                        existing_checkout = attend_obj.search([
+                            ('employee_id', '=', employee_id),
+                            ('punching_time', '=', auto_checkout_utc),
+                            ('status', '=', '1')
+                        ], limit=1)
+
+                        if not existing_checkout:
+                            attend_obj.create({
+                                'employee_id': employee_id,
+                                'punching_time': auto_checkout_utc,
+                                'status': '1',
+                                'device': str(device),
+                                'company_id': company_id.id,
+                                'is_calculated': True
+                            })
 
             return {
                 'name': 'Success Message',

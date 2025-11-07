@@ -20,6 +20,7 @@
         <field name="model">attendance.log</field>
         <field name="arch" type="xml">
             <search string="Biometric Attendance Search">
+                <field name="company_id"/>
                 <field name="employee_id"/>
                 <field name="device"/>
                 <filter name="today" string="Today" domain="[('punching_time', '&gt;=', datetime.datetime.now().strftime('%Y-%m-%d 00:00:00')),('punching_time', '&lt;=',datetime.datetime.now().strftime('%Y-%m-%d 23:23:59'))]"/>
@@ -28,6 +29,7 @@
                 <separator/>
                 <filter name="my_attendances" string="My Attendances" domain="[('employee_id.user_id.id', '=', uid)]"/>
                 <group expand="0" string="Group By">
+                    <filter name="company_id" string="Company" context="{'group_by':'company_id'}"/>
                     <filter name="employee" string="Employee" context="{'group_by':'employee_id'}"/>
                     <separator/>
                     <filter name="groupby_name" string="Month" context="{'group_by':'punching_time'}"/>

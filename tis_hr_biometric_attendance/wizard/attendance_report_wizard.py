@@ -22,6 +22,10 @@ class AttendanceReportWizard(models.TransientModel):
     report_from = fields.Selection([('attend', 'From Attendance'),
                                     ('log', 'From Log')],
                                    string='Report', required=True, default='attend')
+    company_id = fields.Many2one('res.company', string='Company',
+                                 required=True, help="Company")
+
+    employee_id = fields.Many2one('hr.employee', string='Employee', domain="[('company_id', '=', company_id)]")
     date_from = fields.Datetime('From', required=True, default=datetime.today())
     date_to = fields.Datetime('To', required=True, default=datetime.today())
     report_file = fields.Binary('File', readonly=True)

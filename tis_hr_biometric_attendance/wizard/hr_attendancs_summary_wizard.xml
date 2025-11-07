@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Wizard Form View -->
+    <record id="view_hr_attendance_summary_wizard_form" model="ir.ui.view">
+        <field name="name">hr.attendance.summary.wizard.form</field>
+        <field name="model">hr.attendance.summary.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Attendance Summary Wizard">
+                <group>
+                    <field name="date_from"/>
+                    <field name="date_to"/>
+                    <field name="department_id"/>
+                </group>
+                <footer>
+                    <button string="Compute &amp; Save" type="object" name="action_compute_and_save"
+                            class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action to open the wizard -->
+    <record id="action_hr_attendance_summary_wizard" model="ir.actions.act_window">
+        <field name="name">Attendance Summary Wizard</field>
+        <field name="res_model">hr.attendance.summary.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <!-- Menu item (optional, if you want a menu for the wizard) -->
+    <menuitem id="menu_hr_attendance_summary_wizard"
+              name="Attendance Summary Wizard"
+              parent="hr.menu_hr_root"
+              action="action_hr_attendance_summary_wizard"/>
+</odoo>

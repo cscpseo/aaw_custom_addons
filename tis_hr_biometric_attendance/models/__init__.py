@@ -6,3 +6,4 @@ from . import biometric_device_config
 from . import biometric_attnd_log
 from . import hr_employee
 from . import res_config_settings
+from . import hr_attendance_summary

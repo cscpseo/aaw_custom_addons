@@ -25,3 +25,6 @@ access_biometric_wizard3_hr_user,biometric.wizard3.user,model_success_wizard,hr_
 access_biometric_device_wizard_manager,access.biometric.device.wizard.manager,model_biometric_device_wizard,hr_attendance.group_hr_attendance_manager,1,1,1,1
 access_biometric_device_wizard_user,access.biometric.device.wizard.user,model_biometric_device_wizard,hr_attendance.group_hr_attendance_own_reader,1,1,1,0
 access_biometric_device_wizard_base_user,access.biometric.device.wizard.base_user,model_biometric_device_wizard,base.group_user,1,0,0,0
+
+access_hr_attendance_summary,access_hr_attendance_summary,model_hr_attendance_summary,,1,1,1,1
+access_hr_attendance_summary_wizard,access_hr_attendance_summary_wizard,model_hr_attendance_summary_wizard,,1,1,1,1

@@ -10,7 +10,10 @@
                     <group colspan="4"
                            invisible="is_printed == True">
                         <!--                           attrs="{'invisible': [('is_printed','=',True)]}">-->
+
                         <group>
+                            <field name="company_id"/>
+                            <field name="employee_id"/>
                             <field name="report_from"/>
                         </group>
                         <group>
