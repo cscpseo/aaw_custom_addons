@@ -1,0 +1,9 @@
+<odoo>
+    <record id="attendance_summary_xlsx_report" model="ir.actions.report">
+        <field name="name">Attendance Summary XLSX</field>
+        <field name="model">hr.attendance.summary</field>
+        <field name="report_type">xlsx</field>
+        <field name="report_name">tis_hr_biometric_attendance.attendance_summary_xlsx</field>
+        <field name="report_file">tis_hr_biometric_attendance.attendance_summary_xlsx</field>
+    </record>
+</odoo>

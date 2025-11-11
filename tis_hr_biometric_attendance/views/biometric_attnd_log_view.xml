@@ -47,10 +47,23 @@
         <field name="search_view_id" ref="biometric_attnd_log_filter"/>
     </record>
 
+    <!--<menuitem action="action_biometric_attnd_log_view"
+              id="menu_biometric_attnd_log"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="2"
+              groups="hr_attendance.group_hr_attendance_manager, exl_employee_customization.group_attendance_access"/>-->
+
     <menuitem action="action_biometric_attnd_log_view"
               id="menu_biometric_attnd_log"
               parent="hr_attendance.menu_hr_attendance_root"
               sequence="2"
-              groups="hr_attendance.group_hr_attendance_manager"/>
+              groups="exl_employee_customization.group_attendance_access"/>
+
+
+    <menuitem id="hr_attendance.menu_hr_attendance_view_attendances"
+              name="Overview"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="5"
+              groups="exl_employee_customization.group_attendance_access"/>
 
 </odoo>

@@ -16,7 +16,7 @@
     'license': 'Other proprietary',
     'description': """
  Synchronization of employee attendance with biometric machine ...""",
-    'depends': ['hr_attendance'],
+    'depends': ['hr_attendance','report_xlsx','exl_employee_customization'],
     'data': [
         'security/ir.model.access.csv',
         'security/security.xml',
@@ -31,7 +31,7 @@
         'views/hr_attendance_view.xml',
         'views/hr_employee_view.xml',
         'views/res_config_settings.xml',
-
+        'report/attendance_xlsx_report.xml',
     ],
     'demo': [
     ],

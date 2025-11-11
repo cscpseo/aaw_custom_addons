@@ -9,11 +9,13 @@
                 <group>
                     <field name="date_from"/>
                     <field name="date_to"/>
+                    <field name="company_id"/>
                     <field name="department_id"/>
                 </group>
                 <footer>
                     <button string="Compute &amp; Save" type="object" name="action_compute_and_save"
                             class="btn-primary"/>
+                    <button name="action_export_xlsx" type="object" string="Export XLSX" class="btn-secondary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
