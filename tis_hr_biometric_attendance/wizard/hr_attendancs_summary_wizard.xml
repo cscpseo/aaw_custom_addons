@@ -33,6 +33,6 @@
     <!-- Menu item (optional, if you want a menu for the wizard) -->
     <menuitem id="menu_hr_attendance_summary_wizard"
               name="Attendance Summary Wizard"
-              parent="hr.menu_hr_root"
+              parent="hr_attendance.menu_hr_attendance_root"
               action="action_hr_attendance_summary_wizard"/>
 </odoo>
