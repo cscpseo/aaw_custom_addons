@@ -37,7 +37,6 @@ class AttendanceSummaryXlsx(models.AbstractModel):
             'End Date',
             'Total Working Days',
             'Present Days',
-            'Leave Days',
             'Absent Days',
             'Late Count',
             'Generated On',
@@ -55,10 +54,9 @@ class AttendanceSummaryXlsx(models.AbstractModel):
             sheet.write_datetime(row, 3, summary.date_to, date_format)
             sheet.write(row, 4, summary.total_days or 0, center)
             sheet.write(row, 5, summary.present_days or 0, center)
-            sheet.write(row, 6, summary.leave_days or 0, center)
-            sheet.write(row, 7, summary.absent_days or 0, center)
-            sheet.write(row, 8, summary.late_count or 0, center)
-            sheet.write_datetime(row, 9, summary.summary_date, date_format)
+            sheet.write(row, 6, summary.absent_days or 0, center)
+            sheet.write(row, 7, summary.late_count or 0, center)
+            sheet.write_datetime(row, 8, summary.summary_date, date_format)
             row += 1
 
         # Auto-adjust column width
