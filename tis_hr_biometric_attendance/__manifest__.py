@@ -27,6 +27,7 @@
         'wizard/attendance_calc_wizard_view.xml',
         'wizard/biometric_device_view.xml',
         'wizard/attendance_report_wizard_view.xml',
+        'wizard/hr_attendance_detailed_summary_report.xml',
         'wizard/hr_attendancs_summary_wizard.xml',
         'views/hr_attendance_view.xml',
         'views/hr_employee_view.xml',

@@ -28,3 +28,4 @@ access_biometric_device_wizard_base_user,access.biometric.device.wizard.base_use
 
 access_hr_attendance_summary,access_hr_attendance_summary,model_hr_attendance_summary,,1,1,1,1
 access_hr_attendance_summary_wizard,access_hr_attendance_summary_wizard,model_hr_attendance_summary_wizard,,1,1,1,1
+access_hr_attendance_detailed_summary_wizard,access_hr_attendance_detailed_summary_wizard,model_hr_attendance_detailed_summary_wizard,,1,1,1,1

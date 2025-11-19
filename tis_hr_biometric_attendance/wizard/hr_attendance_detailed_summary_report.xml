@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <!-- Wizard Form View -->
-    <record id="view_hr_attendance_summary_wizard_form" model="ir.ui.view">
-        <field name="name">hr.attendance.summary.wizard.form</field>
-        <field name="model">hr.attendance.summary.wizard</field>
+    <record id="view_hr_attendance_detailed_summary_wizard_form" model="ir.ui.view">
+        <field name="name">hr.attendance.detailed.summary.wizard.form</field>
+        <field name="model">hr.attendance.detailed.summary.wizard</field>
         <field name="arch" type="xml">
-            <form string="Attendance Summary Wizard">
+            <form string="Attendance detailed Summary Wizard">
                 <group>
                     <group>
                         <field name="company_id"/>
@@ -19,8 +19,6 @@
 
                 </group>
                 <footer>
-                    <button string="Compute &amp; Save" type="object" name="action_compute_and_save"
-                            class="btn-primary"/>
                     <button name="action_export_xlsx" type="object" string="Print XLSX" class="btn-secondary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
@@ -29,16 +27,16 @@
     </record>
 
     <!-- Action to open the wizard -->
-    <record id="action_hr_attendance_summary_wizard" model="ir.actions.act_window">
-        <field name="name">Attendance Summary Wizard</field>
-        <field name="res_model">hr.attendance.summary.wizard</field>
+    <record id="action_hr_attendance_detailed_summary_wizard" model="ir.actions.act_window">
+        <field name="name">Attendance Detailed Summary Wizard</field>
+        <field name="res_model">hr.attendance.detailed.summary.wizard</field>
         <field name="view_mode">form</field>
         <field name="target">new</field>
     </record>
 
     <!-- Menu item (optional, if you want a menu for the wizard) -->
-    <menuitem id="menu_hr_attendance_summary_wizard"
-              name="Attendance Summary Wizard"
+    <menuitem id="menu_hr_attendance_detailed_summary_wizard"
+              name="Attendance Detailed Summary Wizard"
               parent="hr_attendance.menu_hr_attendance_root"
-              action="action_hr_attendance_summary_wizard"/>
+              action="action_hr_attendance_detailed_summary_wizard"/>
 </odoo>

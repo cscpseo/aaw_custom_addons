@@ -9,6 +9,12 @@ class HrAttendanceSummaryWizard(models.TransientModel):
     date_to = fields.Date(string="End Date",   required=True)
     company_id = fields.Many2one('res.company', string="Company")
     department_id = fields.Many2one('hr.department', string="Department", domain="[('company_id', '=', company_id)]")
+    employee_id = fields.Many2one(
+        'hr.employee',
+        string="Employee",
+        domain="[('department_id', '=', department_id)]"
+    )
+
 
     def action_export_xlsx(self):
         self.ensure_one()
@@ -25,6 +31,10 @@ class HrAttendanceSummaryWizard(models.TransientModel):
         domain = [('date_from', '=', start), ('date_to', '=', end)]
         if self.department_id:
             domain.append(('employee_id.department_id', '=', self.department_id.id))
+
+        if self.employee_id:
+            domain.append(('employee_id', '=', self.employee_id.id))
+
         summaries = SummaryModel.search(domain)
 
         # If no summaries, compute and create them automatically
@@ -108,7 +118,7 @@ class HrAttendanceSummaryWizard(models.TransientModel):
 
                     if att:
                         present_days += 1
-                        if att.is_late:  # ✅ Count lateness
+                        if att.is_late:
                             late_count += 1
                     else:
                         absent_days += 1
@@ -124,7 +134,7 @@ class HrAttendanceSummaryWizard(models.TransientModel):
                 'present_days': present_days,
                 'leave_days': leave_days,
                 'absent_days': absent_days,
-                'late_count': late_count,  # ✅ New field
+                'late_count': late_count,
             })
 
         return {
