@@ -10,8 +10,8 @@
                     <div class="oe_button_box" name="button_box">
                         <button name="test_device_connection" class="oe_stat_button"
                                 icon="fa-plug" type="object" string="Test Connection"/>
-                        <button name="sync_employees" class="oe_stat_button"
-                                icon="fa-retweet" type="object" string="Sync Employees"/>
+                        <!--<button name="sync_employees" class="oe_stat_button"
+                                icon="fa-retweet" type="object" string="Sync Employees"/>-->
                         <button name="download_attendance_log" class="oe_stat_button"
                                 icon="fa-download" type="object" string="Download Attendance"/>
                     </div>
