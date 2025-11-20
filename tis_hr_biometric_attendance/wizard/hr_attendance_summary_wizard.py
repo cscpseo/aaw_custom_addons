@@ -29,6 +29,9 @@ class HrAttendanceSummaryWizard(models.TransientModel):
         # Filter summaries
         domain = [('date_from', '=', start), ('date_to', '=', end)]
 
+        if self.company_id:
+            domain.append(('employee_id.company_id', '=', self.company_id.id))
+
         if self.department_id:
             domain.append(('employee_id.department_id', '=', self.department_id.id))
 
@@ -69,6 +72,8 @@ class HrAttendanceSummaryWizard(models.TransientModel):
 
         # Filter employees
         emp_domain = []
+        if self.company_id:
+            emp_domain.append(('company_id', '=', self.company_id.id))
         if self.department_id:
             emp_domain.append(('department_id', '=', self.department_id.id))
         if self.employee_id:
