@@ -60,7 +60,7 @@ class HrAttendance(models.Model):
                 # Convert UTC stored check_in to user's local timezone
                 local_dt = fields.Datetime.context_timestamp(rec, rec.check_in)
                 # Now build threshold at 09:15 of that local date
-                threshold = local_dt.replace(hour=9, minute=15, second=0, microsecond=0)
+                threshold = local_dt.replace(hour=9, minute=16, second=0, microsecond=0)
                 if local_dt > threshold:
                     diff = local_dt - threshold
                     rec.late_minutes = int(diff.total_seconds() / 60)
