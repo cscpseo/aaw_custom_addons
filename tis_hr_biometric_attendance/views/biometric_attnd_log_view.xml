@@ -92,4 +92,11 @@
               sequence="5"
               groups="exl_employee_customization.group_attendance_access"/>
 
+
+    <menuitem id="hr_attendance.menu_hr_attendance_view_attendances_management"
+              name="Management"
+              parent="hr_attendance.menu_hr_attendance_root"
+              sequence="5"
+              groups="exl_employee_customization.group_attendance_access"/>
+
 </odoo>
