@@ -26,7 +26,11 @@ class BiometricDeviceConfig(models.Model):
     def _check_device_ip(self):
         """Validation if Same Device IP Already Exists"""
         for config in self:
-            existing_configuration = self.env['biometric.config'].search([('device_ip','=',config.device_ip)])
+            # existing_configuration = self.env['biometric.config'].search([('device_ip','=',config.device_ip)])
+            existing_configuration = self.env['biometric.config'].search([
+                ('device_ip', '=', config.device_ip),
+                ('id', '!=', config.id)
+            ], limit=1)
             if existing_configuration:
                 raise ValidationError('Device IP already configured')
 
